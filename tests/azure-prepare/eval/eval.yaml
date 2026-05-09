@@ -42,6 +42,8 @@ graders:
     name: security_posture
     config:
       pattern: "(?i)connection.?string.*=.*Account(Key|Name)=|SharedAccessKey="
+  # NOTE: nodejs_entry_point grader is scoped to JS/TS tasks only;
+  # Python and C# tasks should not be penalized for missing Node patterns.
   - type: output-matches
     name: nodejs_entry_point
     config:
