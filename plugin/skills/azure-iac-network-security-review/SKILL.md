@@ -57,7 +57,7 @@ Never narrate the skill's internal workflow or implementation in any channel the
 Before sending any user-visible message, scan for these and rewrite if present:
 
 - Internal artifact terms: `scratch file`, `.network-security-review-...`, validator output directory.
-- Process-internal naming: `step N` (1–10), `per references/...`, `part 1 / 1b / 2`, or any Part/Phase/Sub-step label.
+- Process-internal naming: `step N`, `per references/...`, `part 1 / 2`, or any Part/Phase/Sub-step label.
 - File or path names of this skill's own files (`SKILL.md`, `references/...`, `assets/...`).
 - The equivalents of any of the above in any language; the guard is semantic, not string literal.
 
@@ -66,7 +66,7 @@ Good: "Grounding done. I have a few questions about platform dependencies before
 
 #### No monetary figures
 
-Never attach a monetary figure to any Azure service, SKU, feature, or remediation. The skill doesn't know the user's pricing, region, currency, or consumption, and Learn is not a pricing source. This bans currency amounts/ranges, ratios ("3x the cost of"), and qualitative cost claims (cheap, expensive, negligible). Qualitative relative cost is fine ("higher recurring cost than Standard"); a number is not ("adds ~$1.50/hour").
+Never attach a monetary figure to any Azure service, SKU, feature, or remediation. The skill doesn't know the user's pricing, currency, or consumption, and Learn is not a pricing source. This bans currency amounts/ranges, ratios ("3x the cost of"), and qualitative cost claims (cheap, expensive, negligible). Qualitative relative cost is fine ("higher recurring cost than Standard"); a number is not ("adds ~$1.50/hour").
 
 #### Match the IaC technology
 
@@ -214,60 +214,21 @@ Every validator rule from step 5 must end up in exactly one place: the Findings 
 
 **Done when:** every finding has a populated entry in the report's [Findings section](./references/report-rules.md#findings), the defense-in-depth pair check has run against the inventory, every validator rule from step 5 is recorded, and every required field is filled.
 
-### 10. Offer workload-context refinement
+### 10. Resolve the network lines-of-sight inventory
 
-Required as the final step when the inventory was classified as a workload. Skip in components-only mode.
+Required for a workload review; skip in components-only mode.
 
-Refinement has two parts. Run them in this order.
+Walk the Network lines-of-sight inventory with the user and resolve every row, following [references/lines-of-sight.md](./references/lines-of-sight.md). Present each row interactively as `Intended` / `Unintended` / `Accepted risk`, promote `Unintended` rows to Findings, and record the verbatim answer in each row.
 
-#### Workload refinement part 1
+**Done when:** every lines-of-sight row is resolved (`Y` / `accepted-risk`, or promoted to a finding) in the report, with the user's answer quoted in the row.
 
-Walk the Network lines-of-sight inventory with the user top-down, in row order. Present each row interactively with `Intended` / `Unintended` / `Accepted risk` options and quote the answer verbatim in the row.
+### 11. Offer workload-context refinement
 
-- `Unintended`: promote to a Findings entry, score severity per the east-west rules in [east-west.md](./references/east-west.md), quote the user in the Issue text.
-- `Accepted risk`: leave the row tagged `accepted-risk` with the reason; don't move to Findings or Suppressed.
-- `Intended`: mark `Y` and stop; the completed inventory stays in the report.
-- Re-rank only if the answer reveals a wrong tier.
+The final step of a workload review; skip in components-only mode.
 
-Don't invite the broader workload-context conversation until the inventory is resolved or deferred.
+Follow [references/refinement.md](./references/refinement.md). You'll resolve the report's open questions, hand the report back and offern an optional requirements-based refinement pass.
 
-#### Workload refinement part 1b: Open questions
-
-Immediately after part 1, walk the report's "Open questions for the user" section. Present every numbered entry as its own discrete prompt, batched into one tool invocation; skip if the section is empty. If the user defers an item, leave it verbatim and proceed.
-
-#### Hand the report back to the user and gate part 2
-
-After parts 1 and 1b have written every answer into the report, stop; don't start part 2 automatically. Send one short message that, in order: (1) names the report file path; (2) states that the network lines-of-sight and open questions are resolved in the file; (3) asks whether the user wants a refinement pass based on additional functional and non-functional requirements.
-
-If the user answers No, declines, or only wants to review the report, the skill is complete; they can return for the workload-context pass later. If Yes, proceed to part 2.
-
-#### Workload refinement part 2
-
-Reached only after the user explicitly opted in. Invite broader workload context to refine existing findings, using wording such as:
-
-> "The findings so far come from the IaC and Microsoft Learn security data; they don't know your workload's functional or non-functional requirements. Share that context and I'll refine the report against your constraints.
->
-> Helpful inputs:
->
-> - **Environment**: the report assumed production. If this is a POC, dev/test, or any non-prod environment, say so.
-> - **Data sensitivity / regulatory scope**: PII, PHI, PCI, FedRAMP, sovereign-cloud requirements?
-> - **Latency / throughput SLOs**: any user-facing or service-to-service latency budgets?
-> - **User base and access patterns**: internet-public, B2B partners only, internal corp-only, employee-only?
-> - **Cost ceiling or constraints**: any hard limits that rule out certain solutions?
-> - **Additional org policies or compensating controls** not visible in IaC or covered by the trust statements.
-> - **Known exceptions or accepted risks**: anything security has already signed off on?
->
-> Tell me what applies and I'll update the report."
-
-Rules for the refinement loop (open conversation, no fixed procedure):
-
-- Only adjust findings the new info affects. State which changed and why.
-- When severity changes, show both values (e.g., `Severity: was High, now Medium (reason)`).
-- Don't delete a suppressed finding; move it to a `## Suppressed by workload context` section with the reason and source user input.
-- Stay grounded. New recommendations still need a Learn citation and a tradeoffs entry; workload context shifts severity and applicability, not sourcing rules.
-- Capture every refinement input in the report header's Assumptions block, attributed to the user.
-
-The loop ends when the user is done; the skill enforces no completion condition.
+**Done when:** the open questions are resolved, the user has been handed the report path and asked about the refinement pass, and any opted-in refinement loop ran to completion.
 
 ## Tooling
 
