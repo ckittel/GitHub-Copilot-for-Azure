@@ -2,6 +2,13 @@
 
 How to enumerate the IaC once it parses. Drives every later step: grounding, flow analysis, and findings all key off the inventory rows.
 
+## Confirm the IaC parses first
+
+Run whichever applies, read-only. If it reports errors, surface them and stop; don't inventory IaC that doesn't parse. If the tool isn't installed, skip and note in the scratch file that the inventory lacked parse verification.
+
+- Bicep: `az bicep build --file <file>` to compile to ARM JSON and resolve `module` references. Do not run `az deployment ...`.
+- Terraform: `terraform init -backend=false` then `terraform validate`. Do not run `terraform plan`.
+
 ## What to capture per resource
 
 Enumerate every networked resource and traffic-relevant feature. For each, capture:

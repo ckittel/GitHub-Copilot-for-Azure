@@ -109,12 +109,7 @@ Do three things in this step, in order:
 
 ### 2. Inventory the IaC
 
-Confirm the IaC parses before inventorying. Run whichever applies. If it reports errors, surface them and stop. Don't inventory IaC that doesn't parse. If the tool isn't installed, skip and note in the scratch file that the inventory lacked parse verification.
-
-- Bicep: `az bicep build --file <file>` to compile to ARM JSON and resolve `module` references. Do not run `az deployment ...`.
-- Terraform: `terraform init -backend=false` then `terraform validate`. Do not run `terraform plan`.
-
-Enumerate the IaC following [references/inventory.md](./references/inventory.md).
+Confirm the IaC parses before inventorying, then enumerate every networked resource. Follow [references/inventory.md](./references/inventory.md) for the process.
 
 For every subnet, capture its purpose using the classifier in [references/subnet-purposes.md](./references/subnet-purposes.md). The purpose tag drives per-subnet NSG expectations; without it, NSG findings become generic "is there an NSG?" checks.
 
