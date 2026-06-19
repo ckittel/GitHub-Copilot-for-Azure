@@ -51,53 +51,39 @@ Every finding must cite at least one Tier 1 Learn URL, the specific file:lines f
 
 ## Interacting with the user
 
-Never narrate the skill's internal workflow or implementation details in any channel the user sees: chat, question prompts, status updates, or the rendered report. The user asked for a network security review; the machinery that produces it stays invisible.
+Never narrate the skill's internal workflow or implementation in any channel the user sees (chat, question prompts, status updates, the report). The user asked for a network security review; the machinery stays invisible.
 
 ### Forbidden in any user-visible text
 
-Before sending any user-visible message, scan for these and rewrite if any appear. They are forbidden to appear in any user-visible text.
+Before sending any user-visible message, scan for these and rewrite if present:
 
-#### Internal artifact terms
-
-- `scratch file`, `.network-security-review-...`, `validator output directory`
-- `step N` (`step 1`–`step 10`), `per references/...`, and `part 1 / 1b / 2` or any other Part/Phase/Sub-step naming for a step's internals
-- file or path names of this skill's own files (`SKILL.md`, `references/...`, `assets/...`)
-- the equivalents of any of the above in any language. The guard is semantic, not string literal.
+- Internal artifact terms: `scratch file`, `.network-security-review-...`, validator output directory.
+- Process-internal naming: `step N` (1–10), `per references/...`, `part 1 / 1b / 2`, or any Part/Phase/Sub-step label.
+- File or path names of this skill's own files (`SKILL.md`, `references/...`, `assets/...`).
+- The equivalents of any of the above in any language; the guard is semantic, not string literal.
 
 Bad: "Step 6 done. Moving to step 7." / "Per SKILL.md, I need to ask you about platform dependencies."
-Good: "Grounding done. A few questions about platform dependencies before we continue."
+Good: "Grounding done. I have a few questions about platform dependencies before we continue."
 
 #### No monetary figures
 
-Never attach a monetary figure to an Azure service, SKU, feature, or remediation. The skill doesn't know the user's pricing agreements, region, currency, or consumption, and Microsoft Learn is not a pricing source. This bans currency amounts and ranges, ratios ("3x the cost of"), and qualitative cost claims (cheap, expensive, negligible cost). For example, it's okay to say "higher recurring cost than Standard," but never "adds ~$1.50/hour."
+Never attach a monetary figure to any Azure service, SKU, feature, or remediation. The skill doesn't know the user's pricing, region, currency, or consumption, and Learn is not a pricing source. This bans currency amounts/ranges, ratios ("3x the cost of"), and qualitative cost claims (cheap, expensive, negligible). Qualitative relative cost is fine ("higher recurring cost than Standard"); a number is not ("adds ~$1.50/hour").
 
-#### No vocabulary from IaC technologies not under review
+#### Match the IaC technology
 
-The IaC scope confirmed in Step 1 fixes the technology: Bicep, Terraform (`.tf` / `.tfvars` / HCL), or a mix. Every user-visible reference to IaC mechanics must match the IaC in scope. For example, don't mention tfvars in a Bicep-only review.
+The scope set in step 1 fixes the technology (Bicep, Terraform/HCL, or a mix). Every user-visible reference to IaC mechanics must match it. E.g., don't mention tfvars in a Bicep-only review.
 
 ### Asking questions
 
-For every question the agent must ask the user:
-
-- Ask interactively via the host's question facility (e.g., the askQuestions tool in VS Code). Provide concise options for fixed choices (Yes/No, one-of-N, `Intended` / `Unintended` / `Accepted risk`); always allow freeform; multi-select when several apply. In non-English conversations, present option labels bilingually (English literal first, translation in parentheses) and record the English literal so downstream instructions match.
-- One question per item, batched into one tool invocation per step. Every dependency row, Network lines-of-sight row, unresolved IaC reference, and "Open questions for the user" entry is its own discrete question. Submit a step's questions together in a single call.
-- Ask only questions required by the currently executing step; none from later steps.
-- Do not generate downstream content while a blocking question is outstanding.
+- Ask interactively via the host's question facility (e.g., the askQuestions tool in VS Code). Give concise options for fixed choices (Yes/No, one-of-N, `Intended` / `Unintended` / `Accepted risk`), always allow freeform, and multi-select when several apply.
+- One question per item, all of a step's questions batched into one tool call. Every dependency row, Network lines-of-sight row, unresolved IaC reference, and "Open questions" entry is its own discrete question.
+- Ask only the active step's questions; never any from later steps. Don't generate downstream content while a blocking question is outstanding.
 
 Non-blocking observations ("FYI, validator X was skipped") stay as plain status messages, not interactive prompts.
 
 ### Operating in a non-English conversation
 
-The report and all chat output are written in the user's conversation language.
-
-These items stay in English regardless of conversation language, because the skill procedures references them:
-
-- Report section headings
-- Severity labels in findings: `Critical`, `High`, `Medium`, `Low`, `Info`
-- Answer literals recorded in tables: `Intended`, `Unintended`, `Accepted risk`, `Y`, `N`, `accepted-risk`.
-- Trust-statement IDs (`tr:<name>`), MCSB control IDs, validator rule IDs, Azure resource property names, file paths, and URLs.
-
-Your dialog around these literals, status updates, and interactive question text is in the user's language.
+The report and all chat output are written in the user's conversation language, but these literals stay in English because the procedures reference them: report section headings; severity labels (`Critical`, `High`, `Medium`, `Low`, `Info`); table answer literals (`Intended`, `Unintended`, `Accepted risk`, `Y`, `N`, `accepted-risk`); and IDs/names (`tr:<name>`, MCSB control IDs, validator rule IDs, Azure property names, file paths, URLs). For fixed-choice options, present labels bilingually (English literal first, translation in parentheses) and record the English literal so downstream instructions match.
 
 ## Sequential steps
 
