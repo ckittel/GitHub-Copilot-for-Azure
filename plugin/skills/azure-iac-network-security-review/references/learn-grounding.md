@@ -57,7 +57,7 @@ For the inventory built in SKILL.md step 2:
 
 Applies to every URL written into the report.
 
-- **Every URL is a markdown link `[Descriptive title](URL)`.** The display text is a human-readable title of the destination page or section. Never write bare URLs. Never use angle-bracket autolinks (`<https://...>`). Never use the URL itself as the display text.
+- **Every URL is a markdown link `[Descriptive title](URL)`.** The display text is a human-readable title of the destination page or section. Never write bare URLs. Never use the URL itself as the display text.
 - MCSB control ID is required when a matching control exists in a finding's references. Format: `MCSB control \`NS-#\`: [control title](<deep-link URL>)`.
 - At least one Tier 1 citation is required on every finding.
 - Use deep links to article when the article supports it (`#security`, `#network-security`, `#ns-2-...`).
