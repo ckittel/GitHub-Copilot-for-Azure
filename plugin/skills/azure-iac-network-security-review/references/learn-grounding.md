@@ -8,7 +8,7 @@ Use the `en-us` locale for every Learn URL you fetch; auto-translated pages can 
 
 Tier 1 (authoritative):
 
-1. **Microsoft Cloud Security Benchmark (MCSB) v2, Network Security family.** `learn.microsoft.com/en-us/security/benchmark/azure/mcsb-v2-network-security`. Controls NS-1 through NS-10. Every finding this skill emits should map to a specific NS-* control. If a finding cannot be mapped to MCSB, double-check that it is in fact a network-security finding and not something out of scope.
+1. **Microsoft Cloud Security Benchmark (MCSB) v2, Network Security family.** `learn.microsoft.com/en-us/security/benchmark/azure/mcsb-v2-network-security`. Controls NS-1 through NS-10. Every finding this skill emits should map to a specific NS-* control. If a finding cannot be mapped to MCSB, double-check that it is in fact a network security finding and not something out of scope.
 2. **Well-Architected Framework service guide, Security section.** `learn.microsoft.com/en-us/azure/well-architected/service-guides/<service>`. Strongest per-service source for architectural reasoning and the tradeoffs call-outs that populate the required Tradeoffs field on every finding.
 
 Tier 2 (supplementary):
@@ -49,6 +49,7 @@ For the inventory built in SKILL.md step 2:
    2. **Well-Architected Framework service guide**: search `well-architected security <service>`. Pick the most relevant `well-architected/service-guides/` result and fetch the full page via `microsoft_docs_fetch`. Extract the Security checklist, network-relevant recommendations, and tradeoffs call-outs from the fetched content, not from the search excerpt.
 3. Then fetch Tier 2 supplements:
    - **Per-service reference docs**: when the Well-Architected Framework service guide does not cover a feature the IaC uses. Use `<service> <feature search term>`, then `microsoft_docs_fetch` on the best result.
+   - **Per-service Private Link page** for every PaaS family in scope: fetch it and record its full sub-resource list and which plane (data, control, or both) each serves. The mapping is not uniform across Azure; don't assume, look it up.
 4. **Fetch full page.** Every URL the skill will cite, gather data from, or use to draft a recommendation must come from a `microsoft_docs_fetch` call on that URL during this review. Do not paraphrase a search snippet, do not cite a URL whose body you have not retrieved, and do not assume the snippet includes the page's retirement banner or callouts. If a fetch fails, retry; if it keeps failing, treat the family as ungrounded per [When grounding fails](#when-grounding-fails).
 5. **Scan every fetched page for retirement signals** per [deprecations.md](./deprecations.md). When a feature is flagged deprecated, retiring, in maintenance mode, or superseded, fetch the replacement's page now and use the replacement in any later recommendation. Record the deprecation in the scratch file's `## Deprecations encountered` section.
 6. **Map every finding to an MCSB control.** When writing the finding (SKILL.md step 9), the References field must include both the MCSB control ID and at least one Tier 1 URL. If no MCSB control fits, re-check that the finding is in scope for this skill.

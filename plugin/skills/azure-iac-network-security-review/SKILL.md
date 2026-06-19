@@ -145,15 +145,7 @@ Capture results to the scratch file under `## Validator findings`, one subsectio
 
 ### 6. Ground each component family in Microsoft Learn
 
-Fetch the Tier 1 network-security guidance for every distinct component family from step 2.
-
-Fetch the per-service Private Link page for every PaaS family in scope. Record its full sub-resource list and which plane (data, control, or both) each serves. The mapping is not uniform across Azure; don't assume, look it up.
-
-Follow [references/learn-grounding.md](./references/learn-grounding.md) for source precedence, the excluded-sources list, MCP query patterns, and what to extract from each source.
-
-While reading every Learn page, apply the retirement-signal scan in [references/deprecations.md](./references/deprecations.md). Never recommend a feature flagged with a retirement signal; recommend the replacement and fetch its page now so it's available when findings are drafted.
-
-Every finding emitted later must carry an MCSB control ID (when one fits) and a deep link to the most prescriptive Tier 1 page available.
+Fetch the Tier 1 network security guidance for every distinct component family from step 2. Follow [references/learn-grounding.md](./references/learn-grounding.md) for the grounding process requirements, including the per-page retirement signal search that prevents recommending a deprecated feature.
 
 **Done when:** one Tier 1 page is in context per component family and any conflicts with the static tables are recorded in the scratch file. If MCP returns nothing for a family, follow [Failure modes](#failure-modes).
 

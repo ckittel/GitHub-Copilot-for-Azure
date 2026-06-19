@@ -39,7 +39,7 @@ _No implicit defaults; every network-security-relevant property is set explicitl
 
 ## Findings
 
-_No network-security findings._
+_No network security findings._
 
 ## Open questions for the user
 

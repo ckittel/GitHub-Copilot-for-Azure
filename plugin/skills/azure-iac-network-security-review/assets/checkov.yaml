@@ -1,13 +1,13 @@
-# Checkov configuration for iac-network-security-review
+# Checkov configuration for azure-iac-network-security-review
 #
 # Allow-list of CKV_AZURE_* / CKV2_AZURE_* rules whose descriptions are
-# network-security relevant for Terraform or Bicep targets.
+# network security relevant for Terraform or Bicep targets.
 #
 # Run standalone:  checkov -d <path> --config-file .checkov.yaml
 # (Writes a CLI summary to stdout and `results_json.json` to
 # `.network-security-review-validators/`.)
 #
-# When invoked from the iac-network-security-review skill, the skill
+# When invoked from the azure-iac-network-security-review skill, the skill
 # overrides --output-file-path with a per-run timestamped directory
 
 framework:

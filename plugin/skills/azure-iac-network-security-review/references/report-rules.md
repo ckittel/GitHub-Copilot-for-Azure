@@ -84,7 +84,7 @@ High severity first, then Medium. Within a severity, group by resource type, so 
 
 Group by flow, then by severity, in this order: Critical, then High, then Medium, then Low, then Info.
 
-If no findings were emitted, leave the skeleton's `_No network-security findings._` line in place. Do not omit the section; absence of the Findings section is ambiguous with the review not having happened.
+If no findings were emitted, leave the skeleton's `_No network security findings._` line in place. Do not omit the section; absence of the Findings section is ambiguous with the review not having happened.
 
 Per finding, use this exact shape:
 
