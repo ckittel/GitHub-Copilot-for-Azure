@@ -49,17 +49,17 @@ _No network security findings._
 
 <!-- Populated only after the workload-refinement loop runs. Omit this section if it has not run. -->
 
-## Out of scope
+## This report didn't review
 
-A standing reminder of what this skill does not review. Use a different tool to evaluate these concerns.
+- IAM and RBAC, including managed-identity permissions and Microsoft Entra ID configuration.
+- Secrets and key management, Key Vault access policies, secret hygiene & rotation.
+- Encryption at rest, customer-managed keys, double encryption.
+- Application-layer authentication and authorization, including token validation, API scope enforcement, and session handling.
+- Application code security such as input validation, dependency vulnerabilities, and supply chain.
+- Cost, SKU sizing, and capacity.
+- General recoverability and resiliency.
 
-- **IAM and RBAC**, including managed-identity permissions and Microsoft Entra ID configuration.
-- **Secrets and key management**: Key Vault access policies, secret hygiene, rotation.
-- **Encryption at rest**: disk encryption, customer-managed keys, double encryption.
-- **Application-layer authentication and authorization**: token validation, API scope enforcement, session handling.
-- **Application code security**: input validation, dependency vulnerabilities, supply chain.
-- **Cost, SKU sizing, and capacity.**
-- **General recoverability and resiliency**, except where a network choice directly removes redundancy.
+Use a different tool to evaluate these concerns.
 
 ### Azure Resource Manager
 

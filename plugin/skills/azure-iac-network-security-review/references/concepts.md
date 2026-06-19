@@ -28,13 +28,6 @@ The plane matters because a control-plane compromise lets the attacker turn off 
 
 The reachability-vs-authorization split exists because the two controls are independent: even if RBAC were perfect, leaving a control plane endpoint publicly reachable is still a finding, because that surface is a zero-day exploitable surface.
 
-## ARM endpoint
-
-Azure Resource Manager (`management.azure.com`) is intentionally not itemized by this skill.
-
-- ARM is a global multi-tenant service. Its network surface is the public Internet by default and the only network-layer control for it (Azure Resource Manager Private Link) is not typically able to be implemented by a single workload.
-- The [Out of scope section](./report-rules.md#out-of-scope) of every report restates this for the reader so the absence of ARM findings is not mistaken for a gap in the review.
-
 ## Trust statements
 
 A trust statement is a named, user-sourced claim that a control the workload IaC does not contain is being provided by another layer (a platform landing zone, a centralized dependency, or a remote endpoint the user vouches for). The skill never assumes an external control exists.
