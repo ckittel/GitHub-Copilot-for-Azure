@@ -109,7 +109,10 @@ Do three things in this step, in order:
 
 ### 2. Inventory the IaC
 
-Confirm the IaC parses before inventorying. Run the parse-correctness validators under [Tooling](#parse-correctness-validators) (`terraform validate`, `az bicep build`). If either reports errors, surface them and stop. Don't inventory IaC that doesn't parse. If neither tool is installed, skip and note in the scratch file that the inventory lacked parse verification.
+Confirm the IaC parses before inventorying. Run whichever applies. If it reports errors, surface them and stop. Don't inventory IaC that doesn't parse. If the tool isn't installed, skip and note in the scratch file that the inventory lacked parse verification.
+
+- Bicep: `az bicep build --file <file>` to compile to ARM JSON and resolve `module` references. Do not run `az deployment ...`.
+- Terraform: `terraform init -backend=false` then `terraform validate`. Do not run `terraform plan`.
 
 Enumerate the IaC following [references/inventory.md](./references/inventory.md).
 
@@ -227,11 +230,6 @@ Follow [references/refinement.md](./references/refinement.md). You'll resolve th
 - Server: `microsoftdocs` (HTTP MCP at `https://learn.microsoft.com/api/mcp`).
 - Tools: `microsoft_docs_search` (locate the right page), `microsoft_docs_fetch` (retrieve full content).
 - Usage pattern: [references/learn-grounding.md](./references/learn-grounding.md).
-
-### Parse-correctness validators
-
-- `az bicep build --file <file>`: compile Bicep to ARM JSON to confirm parsability and resolve `module` references. Do not run `az deployment ...`.
-- `terraform init -backend=false` then `terraform validate`: confirms Terraform parses. Do not run `terraform plan`.
 
 ### Security-rule validators
 
