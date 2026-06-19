@@ -170,3 +170,9 @@ Always include this section verbatim from the skeleton at [`../assets/report-tem
 - Line-of-sight is not a finding on its own. A data-plane east-west path that the IaC allows but that is not a categorical defect belongs in the [Network lines-of-sight](#network-lines-of-sight) section, not the Findings list. Promote a row to a finding only after the user confirms in the workload-refinement loop that the path was unintended, or when the path is itself a categorical defect. Control-plane line-of-sight rows are always findings; the bar there is "no legitimate need," not "user confirms unintended."
 - Missing a second layer of defense is a finding only when that pair is in the Required defense-in-depth pairs. Do not invent defense-in-depth recommendations. For drift concerns, the remediation includes a `deny`-effect built-in Azure Policy assignment, not additional stacked Azure controls.
 - Remediations must remove the insecure surface, not harden it.
+
+## Self-contained and external-sourced
+
+The report must be self-contained: assume the reader has no access to this skill's files. Never write file names (`SKILL.md`, `references/*.md`, `assets/...`) or step numbers into the report, and have References cite only external sources (Microsoft Learn URLs, Azure Policy built-in URLs). Carry rule rationale into the report in your own words.
+
+Strip the locale from every Microsoft Learn URL in the report: remove the `/en-us` segment so the reader lands in their own locale (cite `https://learn.microsoft.com/security/benchmark/azure/mcsb-v2-network-security#ns-2`, not the `/en-us` form). This applies only to URLs in the report; scratch-file URLs and URLs the agent fetches keep `/en-us`.

@@ -1,6 +1,6 @@
 ---
 name: azure-iac-network-security-review
-description: "Review the network security of Bicep or Terraform infrastructure-as-code (IaC), grounded in Microsoft Learn. USE WHEN: user asks to audit, review, or evaluate the network security of an Azure workload described in IaC. DO NOT USE WHEN: target is anything other than IaC; requested review is IAM/RBAC secret management, application authentication/authorization, cost, SKU sizing, or general reliability concerns; user wants a generic security review."
+description: "Audit the network security of Azure Bicep or Terraform infrastructure-as-code (IaC), grounded in Microsoft Learn. WHEN: \"review network security of my Bicep/Terraform\", \"audit IaC network exposure\", \"check NSGs and private endpoints in my IaC\". DO NOT USE FOR: non-IaC targets; IAM/RBAC, secrets, app auth, cost, SKU sizing, or reliability reviews; generic non-network security reviews."
 license: MIT
 disable-model-invocation: false
 compatibility: Network access required to fetch Microsoft Learn content, access to static analysis tool for IaC files
@@ -285,20 +285,8 @@ The loop ends when the user is done; the skill enforces no completion condition.
 
 Produce a single markdown document. Copy [assets/report-template.md](./assets/report-template.md) as the skeleton, then apply [references/report-rules.md](./references/report-rules.md) to populate each section. Don't invent, reorder, or substitute formats (no JSON, no executive-summary essay).
 
-The report must be self-contained. Assume the reader has no access to this skill's files. Never write file names (`SKILL.md`, `references/*.md`, `assets/...`) or step numbers into the report, and have References cite only external sources (Microsoft Learn URLs, Azure Policy built-in URLs). Carry rule rationale into the report in your own words.
 
-Strip the locale from every Microsoft Learn URL in the report: remove the `/en-us` segment so the reader lands in their own locale (cite `https://learn.microsoft.com/security/benchmark/azure/mcsb-v2-network-security#ns-2`, not the `/en-us` form). Applies only to report URLs; scratch-file URLs and URLs the agent fetches keep `/en-us`.
-
-Write the report to `<scope-name>-network-security-review-<YYYYMMDD-HHMM>.md` in the workspace root. Don't render it inline. Point the user at the file path and summarize in one or two sentences.
-
-### Reporting stance
-
-Treat the report as a discovery document for a security critical review. Bias the output entirely toward what is wrong or unverified:
-
-- Report only what is broken, missing, weak, or unverified; don't list correctly configured controls.
-- Don't soften language (no "consider," "you may want to"). State the issue, the impact, and the required change.
-- Don't add positively-framed summaries ("overall the architecture is solid..."). The user is here for the gaps.
-- Don't editorialize on the architect's intent or skill. Address findings to the IaC, not the user.
+Write the report to `<scope-name>-network-security-review-<YYYYMMDD-HHMM>.md` in the workspace root. Don't render it inline.
 
 ## Tooling
 
