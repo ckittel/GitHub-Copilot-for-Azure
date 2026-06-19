@@ -49,4 +49,4 @@ Examples:
 - TLS 1.0/1.1 enabled with HSTS vs. minimum TLS 1.2+.
 - FTP with TLS allowed vs. FTP disabled.
 
-Validators and sometimes Microsoft Learn pages recommend the compatibility-shim; the report's remediation must be the removal.
+Static analysis tools and sometimes Microsoft Learn pages recommend a compatibility shim; the report's remediation must be removal.

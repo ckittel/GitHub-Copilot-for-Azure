@@ -44,9 +44,9 @@ The only deliverable is the report. This skill never edits the IaC nor offers to
 Use only two authoritative sources. Never invent recommendations from training knowledge.
 
 1. Microsoft Learn data fetched live via the `microsoftdocs` MCP server. See [references/learn-grounding.md](./references/learn-grounding.md) for source precedence, excluded sources, query patterns, and citation rules.
-2. Static analysis of the IaC via the validators under [Tooling](#tooling).
+2. Analysis of the IaC via available static analysis tools.
 
-Every finding must cite at least one Tier 1 Learn URL, the IaC file:lines, and the MCSB control ID. A validator finding still needs a Tier 1 citation explaining why the rule matters.
+Every finding must cite at least one Tier 1 Learn URL, the IaC file:lines, and the MCSB control ID. A static analysis tool finding still needs a Tier 1 citation explaining why the rule matters.
 
 ## Interacting with the user
 
@@ -56,7 +56,7 @@ Never narrate the skill's internal workflow or implementation in any channel the
 
 Before sending any user-visible message, scan for these and rewrite if present:
 
-- Internal artifact terms: `scratch file`, `.network-security-review-...`, validator output directory.
+- Internal artifact terms: `scratch file`, `.network-security-review-...`, static analysis output directory.
 - Process-internal naming: `step N`, `per references/...`, `part 1 / 2`, or any Part/Phase/Sub-step label.
 - File or path names of this skill's own files (`SKILL.md`, `references/...`, `assets/...`).
 - The equivalents of any of the above in any language; the guard is semantic, not string literal.
@@ -78,11 +78,11 @@ The scope set in step 1 fixes the technology (Bicep, Terraform/HCL, or a mix). E
 - One question per item, all of a step's questions batched into one tool call. Every dependency row, Network lines-of-sight row, unresolved IaC reference, and "Open questions" entry is its own discrete question.
 - Ask only the active step's questions; never any from later steps. Don't generate downstream content while a blocking question is outstanding.
 
-Non-blocking observations ("FYI, validator X was skipped") stay as plain status messages, not interactive prompts.
+Non-blocking observations ("FYI, static analysis tool X was skipped") stay as plain status messages, not interactive prompts.
 
 ### Operating in a non-English conversation
 
-The report and all chat output are written in the user's conversation language, but these literals stay in English because the procedures reference them: report section headings; severity labels (`Critical`, `High`, `Medium`, `Low`, `Info`); table answer literals (`Intended`, `Unintended`, `Accepted risk`, `Y`, `N`, `accepted-risk`); and IDs/names (`tr:<name>`, MCSB control IDs, validator rule IDs, Azure property names, file paths, URLs). For fixed-choice options, present labels bilingually (English literal first, translation in parentheses) and record the English literal so downstream instructions match.
+The report and all chat output are written in the user's conversation language, but these literals stay in English because the procedures reference them: report section headings; severity labels (`Critical`, `High`, `Medium`, `Low`, `Info`); table answer literals (`Intended`, `Unintended`, `Accepted risk`, `Y`, `N`, `accepted-risk`); and IDs/names (`tr:<name>`, MCSB control IDs, static analysis rule IDs, Azure property names, file paths, URLs). For fixed-choice options, present labels bilingually (English literal first, translation in parentheses) and record the English literal so downstream instructions match.
 
 ## Sequential steps
 
@@ -101,7 +101,7 @@ Do three things in this step, in order:
 1. **Create the scratch file.** Write `.network-security-review-scratch-<YYYYMMDD-HHMM>.md` in the workspace root with the current UTC timestamp. This is mandatory; subsequent steps assume it exists and write to it. The user is never told about the file.
 2. **State the two core thoughts to the user about this process.** Do not wait for acknowledgement on either. Use your own words.
    - Absence of a control in the IaC is treated as the control being missing. A control living outside the IaC must be captured as an explicit dependency the user confirms, or it shows up as a finding. The review is scored against a production bar (real users, real data).
-   - This is a long, token-heavy procedure: it walks the full IaC, fetches many Microsoft Learn pages, builds a connectivity graph, runs validators, and outputs a report. Expect a multi-minute run and MCP traffic that scales with IaC size. It's not for quick spot-checks of a single resource.
+   - This is a long, token-heavy procedure: it walks the full IaC, fetches many Microsoft Learn pages, builds a connectivity graph, runs static analysis tools, and outputs a report. Expect a multi-minute run and MCP traffic that scales with IaC size. It's not for quick spot-checks of a single resource.
 3. **Confirm the IaC scope.** Confirm which file(s) or folder contains the IaC. If unclear, ask; don't guess. This is the only question in this step. Record the answer in the scratch file.
 
 
@@ -133,15 +133,18 @@ Skip this step entirely in components-only mode.
 
 **Done when:** every applicable row in the [references/dependencies.md](./references/dependencies.md) table has been asked about and every answer (Yes / No / I don't know) recorded.
 
-### 5. Run static analysis validators
+### 5. Run static analysis tools
 
-Run every relevant read-only security-rule validator installed (see [Security-rule validators](#security-rule-validators) for invocations). Never run anything that requires Azure credentials, deploys resources, or mutates state. Skip uninstalled tools; don't ask the user to install anything.
+Run relevant, read-only static analysis tools. Never run anything that requires Azure credentials, deploys resources, or mutates state. Skip uninstalled tools; don't ask the user to install anything. Write every tool's output into `.network-security-review-static-analysis-<YYYYMMDD-HHMM>/` in the workspace root.
 
-Write every validator's output to `.network-security-review-validators-<YYYYMMDD-HHMM>/` in the workspace root.
+Allowed static analysis tools:
 
-Capture results to the scratch file under `## Validator findings`, one subsection per validator. Per fired rule: raw rule ID, file:line(s), resource, property, stated remediation.
+- `tflint --format json --chdir <path> > .network-security-review-static-analysis-<YYYYMMDD-HHMM>/tflint.json`: tflint with the `terraform-provider-azurerm` ruleset.
+- `checkov -d <path> --config-file <path-to>/assets/checkov.yaml --output-file-path .network-security-review-static-analysis-<YYYYMMDD-HHMM>`: use the skill's curated [skip-list](./assets/checkov.yaml).
 
-**Done when:** every available validator was invoked or skipped with a recorded reason; every invocation wrote output to the per-run directory; the scratch file's `## Validator findings` section has one subsection per validator.
+After every run, read the on-disk output and capture results to the scratch file under `## Static analysis findings`, one subsection per tool. Per fired rule: raw rule ID, file:line(s), resource, property, stated remediation.
+
+**Done when:** every available tool was invoked or skipped with a recorded reason; every invocation wrote output to the per-run directory; the scratch file's `## Static analysis findings` section has one subsection per tool.
 
 ### 6. Ground each component family in Microsoft Learn
 
@@ -170,7 +173,7 @@ Run north-south first, then east-west. In components-only mode, east-west topolo
 
 After both flows complete, run the [references/finalization.md](./references/finalization.md) pass over the combined candidate set.
 
-**Done when:** every inventory row has been walked through the relevant procedure table; every validator finding is reconciled; every candidate finding passed the deprecation gate; every Critical/High candidate finding was re-verified against its cited Microsoft Learn page.
+**Done when:** every inventory row has been walked through the relevant procedure table; every static analysis finding is reconciled; every candidate finding passed the deprecation gate; every Critical/High candidate finding was re-verified against its cited Microsoft Learn page.
 
 ### 9. Produce findings
 
@@ -178,9 +181,9 @@ Render findings in the exact shape defined by [references/report-rules.md](./ref
 
 Before finalizing each finding, run the defense-in-depth pair check per [references/defense-in-depth.md](./references/defense-in-depth.md): when the inventory or finding touches a control in the [Required pairs](./references/defense-in-depth.md#required-pairs) table and only one half is in the IaC, emit a separate finding for the missing partner. Don't invent layers outside that table. Apply the Remediation Azure Policy rule from [report-rules.md](./references/report-rules.md#findings) to every finding.
 
-Every validator rule from step 5 must end up in exactly one place: the Findings section with a Learn citation, an Implicit IaC defaults entry, or explicitly dropped with a one-line reason in the scratch file.
+Every static analysis rule from step 5 must end up in exactly one place: the Findings section with a Learn citation, an Implicit IaC defaults entry, or explicitly dropped with a one-line reason in the scratch file.
 
-**Done when:** every finding has a populated entry in the report's [Findings section](./references/report-rules.md#findings), the defense-in-depth pair check has run against the inventory, every validator rule from step 5 is recorded, and every required field is filled.
+**Done when:** every finding has a populated entry in the report's [Findings section](./references/report-rules.md#findings), the defense-in-depth pair check has run against the inventory, every static analysis rule from step 5 is recorded, and every required field is filled.
 
 ### 10. Resolve the network lines-of-sight inventory
 
@@ -206,15 +209,6 @@ Follow [references/refinement.md](./references/refinement.md). You'll resolve th
 - Tools: `microsoft_docs_search` (locate the right page), `microsoft_docs_fetch` (retrieve full content).
 - Usage pattern: [references/learn-grounding.md](./references/learn-grounding.md).
 
-### Security-rule validators
-
-Invoked in [step 5](#5-run-static-analysis-validators) and reconciled in step 8. Write into `.network-security-review-validators-<YYYYMMDD-HHMM>/`. Never run anything that needs Azure credentials, deploys resources, or edits files.
-
-- `tflint --format json --chdir <path> > .network-security-review-validators-<YYYYMMDD-HHMM>/tflint.json`: tflint with the `terraform-provider-azurerm` ruleset.
-- `checkov -d <path> --config-file <path-to>/assets/checkov.yaml --output-file-path .network-security-review-validators-<YYYYMMDD-HHMM>`: Use the skill's curated [skip-list](./assets/checkov.yaml).
-
-After every run, read the on-disk output to populate the scratch file's `## Validator findings` section.
-
 ## Failure modes
 
 When a precondition isn't met, use these rules instead.
@@ -229,4 +223,4 @@ When a precondition isn't met, use these rules instead.
 
 - **Microsoft Learn MCP not configured.** Stop and ask the user to install the `microsoftdocs` MCP server. Don't proceed to findings without it or fall back to training knowledge.
 - **Microsoft Learn MCP returns no results for a component family.** Stop and tell the user which families are unbacked. Don't fall back to training knowledge. If the user proceeds anyway, add a header disclaimer that grounding was incomplete, list the affected components, and suppress findings for those families.
-- **Static-analysis validator not installed.** Skip it silently; don't announce the skip or ask the user to install anything.
+- **Static analysis tool not installed.** Skip it silently; don't announce the skip or ask the user to install anything.

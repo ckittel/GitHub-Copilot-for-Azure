@@ -3,7 +3,7 @@
 This skill must never recommend a feature that Microsoft has deprecated, marked retiring, marked legacy, or superseded with a successor even when:
 
 - Microsoft Learn still documents the deprecated feature in detail.
-- A static-analysis validator still finds it and recommends "configure X" where X is the deprecated thing.
+- A static analysis tool still finds it and recommends "configure X" where X is the deprecated thing.
 - The deprecated feature appears in the existing IaC and the user has not yet been told it is on the retirement path.
 
 The agent detects deprecation on the fly while grounding.
@@ -34,9 +34,9 @@ When step 2 inventory or any later walk finds a resource shape that grounding ha
 - **Remediation**: the replacement, with the property changes required to switch.
 - **References**: the retirement notice URL and the replacement's Learn page.
 
-## When a validator recommends a deprecated feature
+## When a static analysis tool recommends a deprecated feature
 
-A validator rule may fire correctly but recommend a deprecated control as the fix. Lift the rule into a finding because the gap is real, but rewrite the Remediation to the replacement the live grounding identified. The validator's stated remediation does not govern; the Learn-grounded recommendation does. Note the rewrite in the scratch file's `## Validator findings` section so the disposition is auditable.
+A static analysis rule may fire correctly but recommend a deprecated control as the fix. Lift the rule into a finding because the gap is real, but rewrite the Remediation to the replacement the live grounding identified. The tool's stated remediation does not govern; the Learn-grounded recommendation does. Note the rewrite in the scratch file's `## Static analysis findings` section so the disposition is auditable.
 
 ## What this rule does not authorize
 

@@ -5,7 +5,7 @@
 #
 # Run standalone:  checkov -d <path> --config-file .checkov.yaml
 # (Writes a CLI summary to stdout and `results_json.json` to
-# `.network-security-review-validators/`.)
+# `.network-security-review-static-analysis/`.)
 #
 # When invoked from the azure-iac-network-security-review skill, the skill
 # overrides --output-file-path with a per-run timestamped directory
@@ -21,7 +21,7 @@ quiet: true
 output:
   - cli
   - json
-output-file-path: .network-security-review-validators
+output-file-path: .network-security-review-static-analysis
 
 check:
   # ---------- NSG / port restrictions ----------

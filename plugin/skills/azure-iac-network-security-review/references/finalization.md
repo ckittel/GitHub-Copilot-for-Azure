@@ -2,9 +2,9 @@
 
 Run once, after both flows (SKILL.md step 8) have produced their candidate findings, over the combined set.
 
-## Reconcile validator findings
+## Reconcile static analysis findings
 
-Walk the scratch file's `## Validator findings` section:
+Walk the scratch file's `## Static analysis findings` section:
 
 - **Already in your candidate findings:** attach the rule ID (e.g., `Checkov: CKV_AZURE_50`) to References. The Learn citation requirement is unchanged; the rule is supplementary evidence, not a substitute.
 - **Not in your candidate findings:** lift it into a new candidate finding and verify against the Learn page in context for that family, which must support it as a network security control. Apply the in-scope / out-of-scope criteria in [iac-explicitness.md](./iac-explicitness.md#what-network-security-relevant-means).
