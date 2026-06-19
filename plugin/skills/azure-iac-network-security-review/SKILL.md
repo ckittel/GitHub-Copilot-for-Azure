@@ -185,6 +185,8 @@ Every finding emitted later must carry an MCSB control ID (when one fits) and a 
 
 ### 7. Verify explicit IaC coverage of network-security properties
 
+This is the first step that writes final report content, so create the report now: copy [assets/report-template.md](./assets/report-template.md) to `<scope-name>-network-security-review-<YYYYMMDD-HHMM>.md` in the workspace root. From here on, populate its sections as this and later steps produce them, following [references/report-rules.md](./references/report-rules.md).
+
 A network-security-relevant property not set explicitly in the IaC is itself a defect, even if the Microsoft default is safe. Defaults change; the IaC must show its intent.
 
 For every resource, derive its in-scope property set from Microsoft Learn at review time and check each against the IaC. Each unset property is its own finding.
@@ -280,12 +282,6 @@ Rules for the refinement loop (open conversation, no fixed procedure):
 - Capture every refinement input in the report header's Assumptions block, attributed to the user.
 
 The loop ends when the user is done; the skill enforces no completion condition.
-
-## Output
-
-Produce a single markdown document. Copy [assets/report-template.md](./assets/report-template.md) as the skeleton, then apply [references/report-rules.md](./references/report-rules.md) to populate each section. Don't invent, reorder, or substitute formats (no JSON, no executive-summary essay).
-
-Write the report to `<scope-name>-network-security-review-<YYYYMMDD-HHMM>.md` in the workspace root. Don't render it inline.
 
 ## Tooling
 
