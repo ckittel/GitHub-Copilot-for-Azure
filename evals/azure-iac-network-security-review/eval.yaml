@@ -1,0 +1,164 @@
+# Vally eval config for the azure-iac-network-security-review skill.
+#
+# Two evaluations:
+#   1. Positive — a request to review the network security of Bicep IaC in the
+#      workspace MUST route to azure-iac-network-security-review.
+#   2. Negative — a request outside this skill's scope (RBAC / role guidance, an
+#      explicit DO NOT USE FOR case) MUST NOT route to this skill; it should
+#      route to azure-prepare instead.
+
+name: azure-iac-network-security-review-eval
+description: |
+  Integration evaluation for the azure-iac-network-security-review skill.
+  Validates routing: a Bicep network-security review request invokes the skill
+  (positive), while an out-of-scope RBAC request does not (negative).
+
+tags:
+  type: integration
+  skill: azure-iac-network-security-review
+
+environment:
+  skills:
+    - ../../plugin/skills/azure-iac-network-security-review
+    # azure-prepare is loaded so the negative routing stimulus can assert that a
+    # prompt outside this skill's scope actually routes to azure-prepare.
+    - ../../plugin/skills/azure-prepare
+
+defaults:
+  runs: 1
+  timeout: "10m"
+  executor: copilot-sdk
+  model: claude-sonnet-4.6
+
+scoring:
+  threshold: 0.8
+
+stimuli:
+  # ── positive-routing ──
+  # A network-security review request for Bicep IaC in the workspace must route
+  # to azure-iac-network-security-review. A sample Bicep file is staged so the
+  # request has a concrete review target.
+  - name: "Positive: review network security of Bicep IaC"
+    prompt: "Review the network security of my Bicep"
+    environment:
+      files:
+        - src: fixture/main.bicep
+          dest: main.bicep
+    tags:
+      type: integration
+      tier: smoke
+      cost: llm
+      area: routing
+      earlyTerminate: '[{"type":"skill-call","skill":"azure-iac-network-security-review"},{"type":"tool-call-count","count":3}]'
+    graders:
+      - type: skill-invocation
+        config:
+          required:
+            - azure-iac-network-security-review
+
+  # ── negative-routing ──
+  # An RBAC / role-assignment request is an explicit DO NOT USE FOR case for this
+  # skill. It must NOT invoke azure-iac-network-security-review; it should route
+  # to azure-prepare (the general Azure planning skill loaded above).
+  - name: "Negative: RBAC role question does not route here"
+    prompt: "What is the least privilege Azure role for my managed identity to read blobs from a storage account, and how do I assign it?"
+    tags:
+      type: integration
+      tier: smoke
+      cost: llm
+      area: routing
+      earlyTerminate: '[{"type":"skill-call","skill":"azure-prepare"},{"type":"tool-call-count","count":3}]'
+    graders:
+      - type: skill-invocation
+        config:
+          disallowed:
+            - azure-iac-network-security-review
+
+  # ── module-not-workload classification ──
+  # fixture/main.bicep is a single isolated storage account — no VNet, compute,
+  # or entry point — so it is NOT a coherent workload. The skill's workload
+  # coherence check (step 3) must classify it as a non-Workload (e.g. component
+  # library / grab bag) and pause to ask how to proceed (scope down /
+  # components-only / abort) instead of running a full workload review.
+  - name: "Classifies single-component Bicep as non-workload"
+    prompt: |
+      Review the network security of main.bicep. That single file is the
+      complete and only IaC scope — do not ask me to confirm the scope.
+      I cannot answer follow-up questions, so proceed autonomously. As part of
+      the review, explicitly state your workload-coherence classification for
+      this IaC (is it a coherent workload, or a component library / module /
+      shared-platform deploy / grab bag) and the evidence behind it.
+    environment:
+      files:
+        - src: fixture/main.bicep
+          dest: main.bicep
+    tags:
+      type: integration
+      tier: full
+      cost: llm
+      area: output
+    graders:
+      # The skill must run to perform the coherence classification.
+      - type: skill-invocation
+        config:
+          required:
+            - azure-iac-network-security-review
+      # Output must surface a non-Workload classification and/or the documented
+      # fallback (components-only) rather than proceeding as a full workload.
+      - type: output-matches
+        config:
+          pattern: "(?i)components?-only|component library|module catalog|grab bag|single (isolated )?(component|resource)|(is ?n'?t|not|does ?n'?t (appear|seem) to be) a (coherent |complete |full )?workload"
+
+  # ── stops when Microsoft Learn MCP is unavailable ──
+  # The skill grounds every finding in Microsoft Learn fetched live via the
+  # `microsoftdocs` MCP server. This eval declares no `environment.mcpServers`,
+  # and the copilot-sdk executor runs each session against a fresh config
+  # directory, so the Learn MCP is NOT available. Per the skill's "Tooling
+  # unavailable" failure mode, it must STOP and ask the user to install/configure
+  # the Learn MCP server — it must not fall back to training knowledge or emit a
+  # findings report. The prompt drives the run past the scope question toward the
+  # grounding step so the missing-MCP condition is actually reached.
+  - name: "Stops when Microsoft Learn MCP is unavailable"
+    prompt: |
+      Review the network security of main.bicep. That single file is the
+      complete and only IaC scope. Do not ask me to confirm the scope.
+      I cannot answer follow-up questions, so proceed autonomously through
+      grounding and on to producing the findings report.
+    environment:
+      files:
+        - src: fixture/main.bicep
+          dest: main.bicep
+    tags:
+      type: integration
+      tier: full
+      cost: llm
+      area: output
+    graders:
+      # The skill must run so it reaches the Learn-grounding step.
+      - type: skill-invocation
+        config:
+          required:
+            - azure-iac-network-security-review
+      # It must surface the missing-Learn-MCP stop signal and ask to install /
+      # configure it, rather than silently grounding from training knowledge.
+      - type: output-matches
+        config:
+          pattern: "(?i)(microsoft ?)?learn mcp|microsoftdocs|mcp[^.\\n]{0,60}(not (configured|available|installed)|unavailable|isn'?t (configured|available))|(install|configure|enable|set up|connect)[^.\\n]{0,80}(learn|microsoft ?docs)[^.\\n]{0,20}mcp"
+
+  # ── negative-routing ──
+  # An RBAC / role-assignment request is an explicit DO NOT USE FOR case for this
+  # skill. It must NOT invoke azure-iac-network-security-review; it should route
+  # to azure-prepare (the general Azure planning skill loaded above).
+  - name: "Negative: Network security for non-IaC use case"
+    prompt: "I'm thinking about building a web app, tell me what network security I should consider."
+    tags:
+      type: integration
+      tier: smoke
+      cost: llm
+      area: routing
+      earlyTerminate: '[{"type":"skill-call","skill":"azure-prepare"},{"type":"tool-call-count","count":3}]'
+    graders:
+      - type: skill-invocation
+        config:
+          disallowed:
+            - azure-iac-network-security-review

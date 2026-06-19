@@ -86,24 +86,18 @@ The report and all chat output are written in the user's conversation language, 
 
 ## Sequential steps
 
-When a step's preconditions are not met or a required tool is unavailable, follow [Failure modes](#failure-modes) before stopping or guessing.
-
-Execute steps in order; keep user interaction scoped to the active step.
-
-Working state lives in a scratch file at `.network-security-review-scratch-<YYYYMMDD-HHMM>.md` in the workspace root. Step 1 creates it; every subsequent step writes to it continuously, committing before moving on. Use whatever internal structure you find useful.
-
-The scratch file is internal working state, not a deliverable. The user is never told it exists, never told it is being written, never told it is being updated. See [Forbidden in any user-visible text](#forbidden-in-any-user-visible-text).
+Execute steps in order; keep user interaction scoped to the active step. When a step's preconditions are not met or a required tool is unavailable, follow [Failure modes](#failure-modes) before stopping or guessing.
 
 ### 1. Say hi and set IaC scope
 
 Do three things in this step, in order:
 
-1. **Create the scratch file.** Write `.network-security-review-scratch-<YYYYMMDD-HHMM>.md` in the workspace root with the current UTC timestamp. This is mandatory; subsequent steps assume it exists and write to it. The user is never told about the file.
+1. **Create the scratch file.** Write `.network-security-review-scratch-<YYYYMMDD-HHMM>.md` in the workspace root with the current UTC timestamp. This is mandatory; subsequent steps assume it exists and write to it.
+   The scratch file is internal working state, not a deliverable. The user is never told it exists, never told it is being written, never told it is being updated. See [Forbidden in any user-visible text](#forbidden-in-any-user-visible-text).
 2. **State the two core thoughts to the user about this process.** Do not wait for acknowledgement on either. Use your own words.
    - Absence of a control in the IaC is treated as the control being missing. A control living outside the IaC must be captured as an explicit dependency the user confirms, or it shows up as a finding. The review is scored against a production bar (real users, real data).
    - This is a long, token-heavy procedure: it walks the full IaC, fetches many Microsoft Learn pages, builds a connectivity graph, runs static analysis tools, and outputs a report. Expect a multi-minute run and MCP traffic that scales with IaC size. It's not for quick spot-checks of a single resource.
 3. **Confirm the IaC scope.** Confirm which file(s) or folder contains the IaC. If unclear, ask; don't guess. This is the only question in this step. Record the answer in the scratch file.
-
 
 **Done when:** the scratch file exists at the documented path; the IaC scope is recorded in it; both opening thoughts have been stated to the user.
 
@@ -197,7 +191,7 @@ Walk the Network lines-of-sight inventory with the user and resolve every row, f
 
 The final step of a workload review; skip in components-only mode.
 
-Follow [references/refinement.md](./references/refinement.md). You'll resolve the report's open questions, hand the report back and offern an optional requirements-based refinement pass.
+Follow [references/refinement.md](./references/refinement.md). You'll resolve the report's open questions, hand the report back and offer an optional requirements-based refinement pass.
 
 **Done when:** the open questions are resolved, the user has been handed the report path and asked about the refinement pass, and any opted-in refinement loop ran to completion.
 
@@ -207,12 +201,12 @@ When a precondition isn't met, use these rules instead.
 
 ### Stop and ask the user, rather than guess, when
 
-- A parameter, variable, `tfvars` value, module input, or referenced output controls a network-security-relevant property (per [iac-explicitness.md](./references/iac-explicitness.md#what-network-security-relevant-means)) and its value isn't visible in the workspace. Ask for the caller or value; don't assume a default.
-- The IaC references modules, `.tfvars`, parameter files, or remote state outputs not in the provided path.
+- A parameter, variable, .tfvars value, module input, or referenced output controls a network-security-relevant property (per [iac-explicitness.md](./references/iac-explicitness.md#what-network-security-relevant-means)) and its value isn't visible in the workspace. Ask for the caller or value; don't assume a default.
+- The IaC references modules, .tfvars, parameter files, or remote state outputs not in the provided path.
 - A finding's severity hinges on a platform-supplied control (hub firewall, central DNS, baseline NSGs via policy) not captured as an explicit trust statement. Ask for it; don't infer.
 
 ### Tooling unavailable
 
-- **Microsoft Learn MCP not configured.** Stop and ask the user to install the `microsoftdocs` MCP server. Don't proceed to findings without it or fall back to training knowledge.
+- **Microsoft Learn MCP not configured.** Stop and ask the user to install the Learn MCP server. Don't proceed to findings without it or fall back to training knowledge.
 - **Microsoft Learn MCP returns no results for a component family.** Stop and tell the user which families are unbacked. Don't fall back to training knowledge. If the user proceeds anyway, add a header disclaimer that grounding was incomplete, list the affected components, and suppress findings for those families.
 - **Static analysis tool not installed.** Skip it silently; don't announce the skip or ask the user to install anything.
