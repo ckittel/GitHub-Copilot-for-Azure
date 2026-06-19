@@ -165,3 +165,7 @@ These exist as findings because the IaC itself is the defect; intent does not ma
 The `Reachable from` source and the affected resource together must make the lateral path obvious in one read. "Reachable from: Adjacent subnet `snet-web`; Resource: `sql-orders` (1433)" tells the reader what packet would have been stopped. "Reachable from: an attacker" does not.
 
 Every finding cites file:line(s), the affected plane (`Plane: data`, `control`, or `both`), the threat source (`Reachable from:`), the specific property to change, and the citations required by [learn-grounding.md](./learn-grounding.md): the MCSB control ID (NS-*) when one applies, plus at least one prescriptive Microsoft Learn URL.
+
+## Apply to every candidate finding
+
+Apply the [per-finding rules](./flow-analysis.md#per-finding-rules) to output from this flow analysis.

@@ -113,3 +113,7 @@ Every north-south finding must name the attacker position (threat source) explic
 If the IaC blocks one source but leaves another open, file the finding against the source that is still open and say so.
 
 Each finding must include: the affected plane (`Plane: data`, `control`, or `both`), the threat source (`Reachable from:`), a concrete remediation that names the resource property and value to change, and the citations required by [learn-grounding.md](./learn-grounding.md): the MCSB control ID (NS-*) when one applies, plus at least one prescriptive Microsoft Learn URL.
+
+## Apply to every candidate finding
+
+Apply the [per-finding rules](./flow-analysis.md#per-finding-rules) to output from this flow analysis.

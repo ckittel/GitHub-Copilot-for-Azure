@@ -161,26 +161,14 @@ Follow [references/iac-explicitness.md](./references/iac-explicitness.md). These
 
 **Done when:** every resource was walked against its Learn-derived property set, and every unset network-security-relevant property has an entry in the Implicit IaC defaults section.
 
-### 8. Run both flows
+### 8. Analyze north-south and east-west security
 
 Run north-south first, then east-west. In components-only mode, east-west topology/reachability analysis is skipped but per-resource east-west hardening checks still run (see [components-only mode](./references/workload-coherence.md#components-only-mode)).
 
 1. North-south: follow [references/north-south.md](./references/north-south.md).
 2. East-west: follow [references/east-west.md](./references/east-west.md).
 
-If step 6's Microsoft Learn data conflicts with the static procedure tables, Learn wins; emit the finding and cite the URL. For every candidate finding, apply the trust-statement re-scoring rules in [references/dependencies.md](./references/dependencies.md) (skip in components-only mode; no trust statements exist).
-
-Never produce findings about IAM/RBAC, Managed Identities, Key Vault secret hygiene, encryption-at-rest, application authentication, cost, SKU sizing, or general reliability. Those are "out of scope for this review" if the user raises them.
-
-For control-plane endpoints, the boundary is network reachability vs authorization: reachability is in scope, authorization is not. "AKS API server reachable from the Internet" is a finding; "too many people have `Contributor`" is not.
-
-Before finalizing the candidate findings, walk the scratch file's `## Validator findings` section:
-
-- Already in your candidate findings: attach the rule ID (e.g., `Checkov: CKV_AZURE_50`) to References. The Learn citation requirement is unchanged; the rule is supplementary evidence, not a substitute.
-- Not in your candidate findings: lift it into a new candidate finding and verify against the Learn page in context for that family, which must support it as a network security control. Apply the in-scope / out-of-scope criteria in [references/iac-explicitness.md](./references/iac-explicitness.md#what-network-security-relevant-means).
-- Firing on a property the IaC explicitness review already flagged as unset: that finding covers it; mark the rule covered and don't double list.
-
-For every Critical or High candidate finding, re-fetch the URL it will cite via the `microsoftdocs` MCP server and confirm the prescriptive text supports both the severity and the recommended change. If Microsoft Learn doesn't support it, downgrade or drop it and note the change in the scratch file.
+After both flows complete, run the [references/finalization.md](./references/finalization.md) pass over the combined candidate set.
 
 **Done when:** every inventory row has been walked through the relevant procedure table; every validator finding is reconciled; every candidate finding passed the deprecation gate; every Critical/High candidate finding was re-verified against its cited Microsoft Learn page.
 
