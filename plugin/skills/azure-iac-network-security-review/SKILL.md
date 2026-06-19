@@ -35,19 +35,18 @@ The only deliverable is the report. This skill never edits the IaC nor offers to
 
 ## Why invoke this skill instead of answering ad hoc
 
-- Every finding is grounded in Microsoft Learn with an enforced citation; ad-hoc training knowledge answers drift.
-- The procedure forces direction, plane, and defense-in-depth coverage.
-- It captures controls outside the IaC as user-affirmed components.
-- It emits structured fields comparable across re-runs.
+- Training data is too risky to ground a security review; every finding is cited to live Microsoft Learn instead.
+- A fixed procedure yields consistent, comparable output across re-runs.
+- It applies a standardized evaluation that surfaces controls missing from the IaC rather than overlooking them.
 
 ## Sources of truth
 
-Use only two authoritative sources. Don't invent recommendations from training knowledge; if neither source supports a finding, don't emit it.
+Use only two authoritative sources. Never invent recommendations from training knowledge.
 
-1. Microsoft Learn data fetched live via the `microsoftdocs` MCP server. See [references/learn-grounding.md](./references/learn-grounding.md) for source precedence, excluded sources, MCP query patterns, and citation rules.
-2. Static analysis of the IaC files using the validators under [Tooling](#tooling).
+1. Microsoft Learn data fetched live via the `microsoftdocs` MCP server. See [references/learn-grounding.md](./references/learn-grounding.md) for source precedence, excluded sources, query patterns, and citation rules.
+2. Static analysis of the IaC via the validators under [Tooling](#tooling).
 
-Every finding must cite at least one Tier 1 Learn URL, the specific file:lines from the IaC, and the MCSB control ID in its References. A finding sourced only from a validator rule still needs a Tier 1 citation explaining why the rule matters for this component.
+Every finding must cite at least one Tier 1 Learn URL, the IaC file:lines, and the MCSB control ID. A validator finding still needs a Tier 1 citation explaining why the rule matters.
 
 ## Interacting with the user
 
@@ -272,8 +271,6 @@ The loop ends when the user is done; the skill enforces no completion condition.
 
 ## Tooling
 
-Here is how you'll invoke each tool.
-
 ### Microsoft Learn MCP
 
 - Server: `microsoftdocs` (HTTP MCP at `https://learn.microsoft.com/api/mcp`).
@@ -287,7 +284,7 @@ Here is how you'll invoke each tool.
 
 ### Security-rule validators
 
-Run during [step 5](#5-run-static-analysis-validators); each tool produces candidate findings reconciled in step 8. Never run anything that requires Azure credentials, deploys resources, or modifies the IaC files. Invocations write into `.network-security-review-validators-<YYYYMMDD-HHMM>/`:
+Invoked in [step 5](#5-run-static-analysis-validators) and reconciled in step 8. Write into `.network-security-review-validators-<YYYYMMDD-HHMM>/`. Never run anything that needs Azure credentials, deploys resources, or edits files.
 
 - `tflint --format json --chdir <path> > .network-security-review-validators-<YYYYMMDD-HHMM>/tflint.json`: tflint with the `terraform-provider-azurerm` ruleset.
 - `checkov -d <path> --config-file <path-to>/assets/checkov.yaml --output-file-path .network-security-review-validators-<YYYYMMDD-HHMM>`: Use the skill's curated [skip-list](./assets/checkov.yaml).
@@ -300,14 +297,12 @@ When a precondition isn't met, use these rules instead.
 
 ### Stop and ask the user, rather than guess, when
 
-Ask every question below via the interactive prompt facility.
-
 - A parameter, variable, `tfvars` value, module input, or referenced output controls a network-security-relevant property (per [iac-explicitness.md](./references/iac-explicitness.md#what-network-security-relevant-means)) and its value isn't visible in the workspace. Ask for the caller or value; don't assume a default.
-- The IaC references modules, `.tfvars`, parameter files, or remote state outputs not in the provided path. Ask for help from the user.
+- The IaC references modules, `.tfvars`, parameter files, or remote state outputs not in the provided path.
 - A finding's severity hinges on a platform-supplied control (hub firewall, central DNS, baseline NSGs via policy) not captured as an explicit trust statement. Ask for it; don't infer.
 
 ### Tooling unavailable
 
-- **Microsoft Learn MCP not configured.** Stop. Ask the user to install the `microsoftdocs` MCP server. Don't proceed to findings without it or fall back to training knowledge.
-- **Microsoft Learn MCP returns no results for a component family.** Stop and tell the user which families are unbacked. Do not fall back to training knowledge. If the user proceeds anyway, add a header disclaimer that grounding was incomplete, list the affected components, and suppress findings for those families.
+- **Microsoft Learn MCP not configured.** Stop and ask the user to install the `microsoftdocs` MCP server. Don't proceed to findings without it or fall back to training knowledge.
+- **Microsoft Learn MCP returns no results for a component family.** Stop and tell the user which families are unbacked. Don't fall back to training knowledge. If the user proceeds anyway, add a header disclaimer that grounding was incomplete, list the affected components, and suppress findings for those families.
 - **Static-analysis validator not installed.** Skip it silently; don't announce the skip or ask the user to install anything.
