@@ -4,6 +4,15 @@ This skill grounds every finding in Microsoft Learn data fetched live via the `m
 
 Use the `en-us` locale for every Learn URL you fetch; auto-translated pages can lose technical precision.
 
+## MCP server
+
+- Server name: `microsoftdocs` (HTTP MCP at `https://learn.microsoft.com/api/mcp`)
+- Tools available:
+  - `microsoft_docs_search`: keyword/semantic search; returns ranked Learn URLs with short excerpt chunks. Use only to pick the right URL. The excerpts are partial and can miss the prescriptive sections, retirement notices, and tables this skill depends on. Never ground a finding on a search snippet.
+  - `microsoft_docs_fetch`: retrieves the full page content for the URL. Always call this on the page you intend to cite.
+
+If the server is not configured, ask the user to configure it. Do not proceed without it.
+
 ## Source precedence
 
 Tier 1 (authoritative):
@@ -29,15 +38,6 @@ Do not cite, fetch for guidance, or quote from these, even when `microsoft_docs_
 If `microsoft_docs_search` returns one of the above as the top hit, discard it and re-search with terms that bias toward the Well-Architected Framework service guide or the per-service docs.
 
 Microsoft Tech Community blog posts, Azure team blogs, MVP articles, and third-party guidance are not authoritative for this skill, regardless of how good they look. They can inform reasoning; they cannot back a finding.
-
-## MCP server
-
-- Server name: `microsoftdocs`
-- Tools available:
-  - `microsoft_docs_search`: keyword/semantic search; returns ranked Learn URLs with short excerpt chunks. Use only to pick the right URL. The excerpts are partial and can miss the prescriptive sections, retirement notices, and tables this skill depends on. Never ground a finding on a search snippet.
-  - `microsoft_docs_fetch`: retrieves the full page content for the URL. Always call this on the page you intend to cite.
-
-If the server is not configured, ask the user to configure it. Do not proceed without it.
 
 ## Grounding loop
 

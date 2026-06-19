@@ -201,14 +201,6 @@ Follow [references/refinement.md](./references/refinement.md). You'll resolve th
 
 **Done when:** the open questions are resolved, the user has been handed the report path and asked about the refinement pass, and any opted-in refinement loop ran to completion.
 
-## Tooling
-
-### Microsoft Learn MCP
-
-- Server: `microsoftdocs` (HTTP MCP at `https://learn.microsoft.com/api/mcp`).
-- Tools: `microsoft_docs_search` (locate the right page), `microsoft_docs_fetch` (retrieve full content).
-- Usage pattern: [references/learn-grounding.md](./references/learn-grounding.md).
-
 ## Failure modes
 
 When a precondition isn't met, use these rules instead.
