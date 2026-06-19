@@ -111,19 +111,9 @@ Do three things in this step, in order:
 
 Confirm the IaC parses before inventorying. Run the parse-correctness validators under [Tooling](#parse-correctness-validators) (`terraform validate`, `az bicep build`). If either reports errors, surface them and stop. Don't inventory IaC that doesn't parse. If neither tool is installed, skip and note in the scratch file that the inventory lacked parse verification.
 
-Enumerate every networked resource and traffic-relevant feature. Capture for each: resource type, logical name, file path, line number, planes exposed, and the network features and controls that matter.
+Enumerate the IaC following [references/inventory.md](./references/inventory.md).
 
 For every subnet, capture its purpose using the classifier in [references/subnet-purposes.md](./references/subnet-purposes.md). The purpose tag drives per-subnet NSG expectations; without it, NSG findings become generic "is there an NSG?" checks.
-
-Some Azure resources expose separate endpoints per plane governed by different settings; others bundle both planes onto one FQDN. Capture both rows when the service splits them. The per-service Microsoft Learn Private Link page is the source of truth (see [references/concepts.md](./references/concepts.md)).
-
-Resource families to look for (non-exhaustive):
-
-- Edge: Front Door, Application Gateway, Load Balancer (public), API Management (external), Public IPs, DDoS plans.
-- Perimeter: Azure Firewall, NVA, NAT Gateway, WAF policies, IP groups, route tables / UDRs.
-- Network fabric: virtual networks, subnets, NSGs, ASGs, virtual network peerings, service endpoints, private endpoints, private DNS zones and links, ExpressRoute gateways, VPN gateways.
-- Compute with network surface: VMs/VMSS, AKS (CNI, network policy, private cluster, authorized IP ranges), App Service / Functions (vnet integration, access restrictions), Container Apps.
-- State stores with network surface: Storage, Key Vault, SQL, Cosmos, Service Bus, Event Hubs, ACR.
 
 **Done when:** parse validators succeeded (or were noted unavailable); every networked resource appears in the inventory with plane(s) and controls; every subnet has a purpose tag (or `unclassified`); undefined IaC references are listed as unresolved.
 
