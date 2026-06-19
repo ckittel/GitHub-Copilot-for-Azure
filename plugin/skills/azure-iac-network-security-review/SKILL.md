@@ -285,7 +285,6 @@ The loop ends when the user is done; the skill enforces no completion condition.
 
 Produce a single markdown document. Copy [assets/report-template.md](./assets/report-template.md) as the skeleton, then apply [references/report-rules.md](./references/report-rules.md) to populate each section. Don't invent, reorder, or substitute formats (no JSON, no executive-summary essay).
 
-
 Write the report to `<scope-name>-network-security-review-<YYYYMMDD-HHMM>.md` in the workspace root. Don't render it inline.
 
 ## Tooling
@@ -308,7 +307,7 @@ Here is how you'll invoke each tool.
 Run during [step 5](#5-run-static-analysis-validators); each tool produces candidate findings reconciled in step 8. Never run anything that requires Azure credentials, deploys resources, or modifies the IaC files. Invocations write into `.network-security-review-validators-<YYYYMMDD-HHMM>/`:
 
 - `tflint --format json --chdir <path> > .network-security-review-validators-<YYYYMMDD-HHMM>/tflint.json`: tflint with the `terraform-provider-azurerm` ruleset.
-- `checkov -d <path> --config-file .github/skills/iac-network-security-review/assets/.checkov.yaml --output-file-path .network-security-review-validators-<YYYYMMDD-HHMM>`: Use the skill's curated [skip-list](./assets/.checkov.yaml).
+- `checkov -d <path> --config-file <path-to>/assets/checkov.yaml --output-file-path .network-security-review-validators-<YYYYMMDD-HHMM>`: Use the skill's curated [skip-list](./assets/checkov.yaml).
 
 After every run, read the on-disk output to populate the scratch file's `## Validator findings` section.
 
