@@ -14,21 +14,22 @@ metadata:
 
 Audit the network security posture of Azure resources defined in Bicep or Terraform. Review along two axes:
 
-- Direction
-  - North-south: traffic between the workload and anything outside it (internet, on-prem, external dependencies, sibling workloads).
-  - East-west: lateral traffic among the workload's own resources (vnet-to-vnet, subnet-to-subnet, service-to-service, pod-to-pod).
+- [Direction](./references/concepts.md#north-south-vs-east-west-direction)
+  - North-south: traffic to/from outside the workload
+  - East-west: lateral traffic among its own resources
 
-- Plane
-  - Data plane: the API surface for data the workload was made to send or receive (HTTPS between components, SQL on 1433, blob reads, AMQP to Service Bus).
-  - Control plane: the management surface that configures or operates the resources (AKS API server, management APIs).
+- [Plane](./references/concepts.md#data-plane-vs-control-plane-plane)
+  - Data: the traffic the workload exists to serve
+  - Control: the management surface that configures the resources
 
 Produce a structured security report containing:
 
 - an inventory of every networked resource and its planes
 - a network lines-of-sight inventory the user validates interactively
-- a findings list grouped by flow and severity with suggested remediations.
+- a findings list grouped by flow and severity with suggested remediations
+- Microsoft Learn references
 
-Finally, user can volunteer workload requirements and constraints for you to personalize report further.
+Finally, the user can volunteer workload requirements and constraints for you to personalize the report further.
 
 The only deliverable is the report. This skill never edits the IaC nor offers to apply a remediation.
 
