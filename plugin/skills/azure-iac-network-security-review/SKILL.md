@@ -113,7 +113,7 @@ For every subnet, capture its purpose using the classifier in [references/subnet
 
 This skill reviews a workload described in IaC as a coherent system. Before grounding and flow analysis, confirm the inventory represents one; otherwise the reasoning will mislead.
 
-Follow [references/workload-coherence.md](./references/workload-coherence.md) to apply the classification heuristics, pick one of the five classifications, and either proceed as a full workload review or stop and offer the documented choices.
+Follow [references/workload-coherence.md](./references/workload-coherence.md) to apply the classification heuristics and either proceed as a full workload review or stop and offer the documented choices.
 
 **Done when:** the inventory carries one classification, and either the review continues as a workload review or the user chose a documented alternative.
 
@@ -201,9 +201,7 @@ When a precondition isn't met, use these rules instead.
 
 ### Stop and ask the user, rather than guess, when
 
-- A parameter, variable, .tfvars value, module input, or referenced output controls a network-security-relevant property (per [iac-explicitness.md](./references/iac-explicitness.md#what-network-security-relevant-means)) and its value isn't visible in the workspace. Ask for the caller or value; don't assume a default.
-- The IaC references modules, .tfvars, parameter files, or remote state outputs not in the provided path.
-- A finding's severity hinges on a platform-supplied control (hub firewall, central DNS, baseline NSGs via policy) not captured as an explicit trust statement. Ask for it; don't infer.
+- The IaC references modules, .tfvars, outputs, or parameter files not in the provided path. Ask for the value; don't assume a default.
 
 ### Tooling unavailable
 
